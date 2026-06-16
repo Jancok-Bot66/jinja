@@ -1,0 +1,22 @@
+FROM php:8.2-fpm-alpine
+RUN apk add --no-cache \
+    nginx curl bash git zip unzip \
+    libpng-dev libjpeg-turbo-dev freetype-dev \
+    oniguruma-dev libxml2-dev \
+&& docker-php-ext-configure gd --with-freetype --with-jpeg \
+&& docker-php-ext-install \
+    pdo pdo_mysql mbstring exif pcntl bcmath gd xml
+COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
+RUN mkdir -p /run/nginx
+WORKDIR /var/www/html
+COPY . .
+RUN rm -rf .env
+RUN composer install --no-dev --optimize-autoloader --ignore-platform-reqs
+RUN chmod -R 777 storage bootstrap/cache
+COPY nginx.conf /etc/nginx/http.d/default.conf
+RUN echo '#!/bin/sh' > /start.sh && \
+    echo 'php-fpm -D' >> /start.sh && \
+    echo 'nginx -g "daemon off;"' >> /start.sh && \
+    chmod +x /start.sh
+EXPOSE 80
+CMD ["/start.sh"]
