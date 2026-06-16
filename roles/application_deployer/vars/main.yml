@@ -1,6 +1,6 @@
 ---
-local_work_dir: "/home/farid"
-remote_work_dir: "/home/farid"
+local_work_dir: "/home/asatxisija2"
+remote_work_dir: "/home/asatxisija2"
 git_repo: "https://github.com/ridzzbahar/parkir.git"
 dh_user: "bahaaar29"
 dh_pass: "Faridganteng1"
