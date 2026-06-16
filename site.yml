@@ -4,7 +4,6 @@
   hosts: webservers
   become: yes
   roles:
-    - docker_installer
     - application_deployer
 
 # TARGET 2: Mengonfigurasi Load Balancer, DNS, dan Monitoring di VM 1 (Control Node)
