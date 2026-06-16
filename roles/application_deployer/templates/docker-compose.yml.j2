@@ -1,0 +1,43 @@
+services:
+  web1:
+    image: {{ dh_user }}/{{ image_name }}
+    container_name: farid_parking_1
+    ports:
+      - "8082:80"
+    volumes:
+      - {{ remote_work_dir }}/.env:/var/www/html/.env
+    depends_on:
+      - db
+  web2:
+    image: {{ dh_user }}/{{ image_name }}
+    container_name: farid_parking_2
+    ports:
+      - "8083:80"
+    volumes:
+      - {{ remote_work_dir }}/.env:/var/www/html/.env
+    depends_on:
+      - db
+  web3:
+    image: {{ dh_user }}/{{ image_name }}
+    container_name: farid_parking_3
+    ports:
+      - "8084:80"
+    volumes:
+      - {{ remote_work_dir }}/.env:/var/www/html/.env
+    depends_on:
+      - db
+  db:
+    image: mysql:8.0
+    container_name: farid_db
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: parkir
+    ports:
+      - "3306:3306"
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin
+    container_name: farid_phpmyadmin
+    ports:
+      - "8081:80"
+    environment:
+      PMA_HOST: db

@@ -1,0 +1,29 @@
+---
+- name: Install HAProxy and OpenSSL
+  apt:
+    name: ['haproxy', 'openssl']
+    state: present
+
+- name: Create SSL Directory
+  file:
+    path: /etc/ssl/farid_parkir
+    state: directory
+
+- name: Generate Self-Signed Cert for farid.local
+  shell: |
+    openssl req -x509 -nodes -days 365 -newkey rsa:2048 \
+    -keyout /etc/ssl/farid_parkir/parkir.key -out /etc/ssl/farid_parkir/parkir.crt \
+    -subj "/C=ID/ST=Z/L=Z/O=DevOps/CN=farid.local"
+  args:
+    creates: /etc/ssl/farid_parkir/parkir.crt
+
+- name: Combine Cert and Key for HAProxy
+  shell: cat /etc/ssl/farid_parkir/parkir.crt /etc/ssl/farid_parkir/parkir.key > /etc/ssl/farid_parkir/parkir.pem
+  args:
+    creates: /etc/ssl/farid_parkir/parkir.pem
+
+- name: Configure HAProxy Frontend & Backend from Template
+  template:
+    src: haproxy.cfg.j2
+    dest: /etc/haproxy/haproxy.cfg
+  notify: restart haproxy

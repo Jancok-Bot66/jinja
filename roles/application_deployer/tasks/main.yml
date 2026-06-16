@@ -1,0 +1,50 @@
+---
+- name: Clone Git Repo to Local (VM 1)
+  delegate_to: localhost
+  git:
+    repo: "{{ git_repo }}"
+    dest: "{{ local_work_dir }}/parkir_source"
+    force: yes
+
+- name: Copy Dockerfile & nginx.conf to Local Source
+  delegate_to: localhost
+  copy:
+    src: "{{ local_work_dir }}/{{ item }}"
+    dest: "{{ local_work_dir }}/parkir_source/{{ item }}"
+  loop: ['Dockerfile', 'nginx.conf']
+
+- name: Build and Push Image from VM 1 to Docker Hub
+  delegate_to: localhost
+  shell: |
+    docker login -u {{ dh_user }} -p {{ dh_pass }}
+    docker build -t {{ dh_user }}/{{ image_name }} {{ local_work_dir }}/parkir_source
+    docker push {{ dh_user }}/{{ image_name }}
+
+- name: Ensure remote directory exists on VM 2
+  file:
+    path: "{{ remote_work_dir }}"
+    state: directory
+
+- name: Generate docker-compose.yml on VM 2 from Template
+  template:
+    src: docker-compose.yml.j2
+    dest: "{{ remote_work_dir }}/docker-compose.yml"
+
+- name: Copy .env to VM 2
+  copy:
+    src: "{{ local_work_dir }}/.env"
+    dest: "{{ remote_work_dir }}/.env"
+
+- name: Deploy Containers via Docker Compose
+  shell: |
+    cd {{ remote_work_dir }}
+    docker compose down --volumes || true
+    docker compose up -d
+
+- name: Wait for MySQL Database to boot up cleanly
+  pause:
+    seconds: 40
+
+- name: Run Laravel Database Migration Automatically
+  shell: |
+    docker exec farid_parking_1 php artisan migrate --force

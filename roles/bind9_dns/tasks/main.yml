@@ -1,0 +1,23 @@
+---
+- name: Install BIND9
+  apt:
+    name: bind9
+    state: present
+
+- name: Configure named.conf.local
+  template:
+    src: named.conf.local.j2
+    dest: /etc/bind/named.conf.local
+
+- name: Configure Zone File
+  template:
+    src: db.farid.j2
+    dest: /etc/bind/db.farid
+
+- name: Restart BIND9
+  systemd:
+    name: bind9
+    state: restarted
+
+- name: Update local resolv.conf
+  shell: echo "nameserver 127.0.0.1" > /etc/resolv.conf

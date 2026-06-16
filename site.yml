@@ -1,0 +1,17 @@
+---
+# TARGET 1: Mengonfigurasi Infrastruktur Docker dan Deploy Apps di VM 2 (Webservers)
+- name: Deploy Infrastructure and Application on VM 2
+  hosts: webservers
+  become: yes
+  roles:
+    - docker_installer
+    - application_deployer
+
+# TARGET 2: Mengonfigurasi Load Balancer, DNS, dan Monitoring di VM 1 (Control Node)
+- name: Configure Network Services and Monitoring on VM 1
+  hosts: Control
+  become: yes
+  roles:
+    - haproxy_lb
+    - bind9_dns
+    - monitor_setup

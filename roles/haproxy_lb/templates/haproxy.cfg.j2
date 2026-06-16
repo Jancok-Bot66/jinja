@@ -1,0 +1,30 @@
+global
+    log /dev/log local0
+    log /dev/log local1 notice
+    chroot /var/lib/haproxy
+    user haproxy
+    group haproxy
+    daemon
+
+defaults
+    log     global
+    mode    http
+    option  httplog
+    option  dontlognull
+    timeout connect 5000
+    timeout client  50000
+    timeout server  50000
+
+frontend http_front
+    bind *:80
+    redirect scheme https code 301 if !{ ssl_fc }
+
+frontend https_front
+    bind *:443 ssl crt /etc/ssl/farid_parkir/parkir.pem
+    default_backend web_containers
+
+backend web_containers
+    balance roundrobin
+    server container1 10.10.10.12:8082 check
+    server container2 10.10.10.12:8083 check
+    server container3 10.10.10.12:8084 check

@@ -1,0 +1,50 @@
+---
+- name: Generate monitor.sh with Correct Shell Logic
+  copy:
+    dest: /home/farid/monitor.sh
+    mode: '0755'
+    content: |
+      #!/bin/bash
+      VM2_IP="10.10.10.12"
+      VM2_USER="farid"
+      DATE=$(date '+%Y-%m-%d %H:%M:%S')
+
+      echo "=========================================="
+      echo " SYSTEM MONITORING REPORT: $DATE"
+      echo "=========================================="
+
+      # 1. Cek status service HAProxy lokal
+      if systemctl is-active --quiet haproxy; then
+          echo -e "HAProxy Service Local : [\e[32mOK\e[0m]"
+      else
+          echo -e "HAProxy Service Local : [\e[31mCRITICAL\e[0m]"
+      fi
+
+      # 2. Cek konektivitas jaringan ke VM 2
+      if ping -c 1 -W 2 $VM2_IP > /dev/null 2>&1; then
+          echo -e "Network Ping to VM 2  : [\e[32mOK\e[0m]"
+      else
+          echo -e "Network Ping to VM 2  : [\e[31mCRITICAL\e[0m]"
+      fi
+
+      # 3. Remote checking status kontainer Docker di VM 2
+      echo "------------------------------------------"
+      echo "[Checking Containers on VM 2 via SSH]"
+
+      CONTAINERS=("farid_parking_1" "farid_parking_2" "farid_parking_3" "farid_db")
+
+      for c in "${CONTAINERS[@]}"; do
+          STATUS=$(ssh -o ConnectTimeout=3 $VM2_USER@$VM2_IP "docker inspect -f '{{ '{{' }}.State.Running{{ '}}' }}' $c" 2>/dev/null)
+          if [ "$STATUS" = "true" ]; then
+              echo -e " Container $c: [\e[32mOK\e[0m] (Running)"
+          else
+              echo -e " Container $c: [\e[31mCRITICAL\e[0m] (Down/Not Found)"
+          fi
+      done
+      echo "=========================================="
+
+- name: Setup Cronjob every 5 minutes
+  cron:
+    name: "Run container monitor"
+    minute: "*/5"
+    job: "bash /home/farid/monitor.sh > /dev/null 2>&1"
