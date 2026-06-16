@@ -1,10 +1,4 @@
 ---
-- name: Clone Git Repo to Local (VM 1)
-  delegate_to: localhost
-  git:
-    repo: "{{ git_repo }}"
-    dest: "{{ local_work_dir }}/parkir_source"
-    force: yes
 
 - name: Copy Dockerfile & nginx.conf to Local Source
   delegate_to: localhost
