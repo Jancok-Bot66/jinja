@@ -1,7 +1,7 @@
 ---
 local_work_dir: "/home/farid"
 remote_work_dir: "/home/farid"
-git_repo: "https://github.com/meguminime/parkir.git"
+git_repo: "https://github.com/ridzzbahar/parkir.git"
 dh_user: "bahaaar29"
 dh_pass: "Faridganteng1"
 image_name: "farid_parkingapp:v1"
