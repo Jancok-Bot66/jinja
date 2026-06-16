@@ -1,11 +1,11 @@
 ---
 - name: Generate monitor.sh with Correct Shell Logic
   copy:
-    dest: /home/farid/monitor.sh
+    dest: /home/asatxisija2/monitor.sh
     mode: '0755'
     content: |
       #!/bin/bash
-      VM2_IP="10.10.10.12"
+      VM2_IP="192.168.1.112"
       VM2_USER="farid"
       DATE=$(date '+%Y-%m-%d %H:%M:%S')
 
@@ -47,4 +47,4 @@
   cron:
     name: "Run container monitor"
     minute: "*/5"
-    job: "bash /home/farid/monitor.sh > /dev/null 2>&1"
+    job: "bash /home/asatxisija2/monitor.sh > /dev/null 2>&1"
