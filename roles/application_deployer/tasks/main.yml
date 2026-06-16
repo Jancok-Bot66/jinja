@@ -16,7 +16,7 @@
   delegate_to: localhost
   shell: |
     docker login -u {{ dh_user }} -p {{ dh_pass }}
-    docker build -t {{ dh_user }}/{{ image_name }} {{ local_work_dir }}/parkir_source
+    docker build -t {{ dh_user }}/{{ image_name }} {{ local_work_dir }}/parkir
     docker push {{ dh_user }}/{{ image_name }}
 
 - name: Ensure remote directory exists on VM 2
