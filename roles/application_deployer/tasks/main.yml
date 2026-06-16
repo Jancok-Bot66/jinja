@@ -1,11 +1,16 @@
 ---
 
-- name: Copy Dockerfile & nginx.conf to Local Source
+- name: Generate Dockerfile from Template to Project Folder
   delegate_to: localhost
-  copy:
-    src: "{{ local_work_dir }}/{{ item }}"
-    dest: "{{ local_work_dir }}/parkir_source/{{ item }}"
-  loop: ['Dockerfile', 'nginx.conf']
+  template:
+    src: Dockerfile.j2
+    dest: "{{ local_work_dir }}/parkir/Dockerfile"
+
+- name: Generate nginx.conf from Template to Project Folder
+  delegate_to: localhost
+  template:
+    src: nginx.conf.j2
+    dest: "{{ local_work_dir }}/parkir/nginx.conf"
 
 - name: Build and Push Image from VM 1 to Docker Hub
   delegate_to: localhost
